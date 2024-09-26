@@ -12,8 +12,8 @@ df = pl.DataFrame(
 )
 result = df.with_columns(
     cluster_id=get_cluster_ids(
-        node_definition=pl.col('user').hash(),
-        edge_definitions=[pl.col('phone').hash(), pl.col('email').hash()],
+        node_definition=pl.col('user'),
+        edge_definitions=['phone', 'email'],
     )
 )
 print(result)

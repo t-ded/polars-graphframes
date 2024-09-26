@@ -1,14 +1,11 @@
 #![allow(clippy::unused_unit)]
 
 use std::collections::HashMap;
-use std::iter;
+use std::iter::zip;
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 use petgraph::graphmap::UnGraphMap;
 use petgraph::algo::tarjan_scc;
-use std::iter::{zip, empty};
-use std::thread::current;
-use petgraph::visit::Walker;
 
 
 #[polars_expr(output_type=UInt64)]
