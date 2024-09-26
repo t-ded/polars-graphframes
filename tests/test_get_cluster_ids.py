@@ -99,10 +99,3 @@ def test_get_cluster_ids_all_isolated() -> None:
 
     print(result.head(5))
     assert result.select('cluster_id').equals(pl.DataFrame({'cluster_id' : list(range(num_rows))}))
-
-if __name__ == '__main__':
-    test_simple_test_case()
-    test_get_cluster_ids_one_cc()
-    test_get_cluster_ids_nine_ccs()
-    test_get_cluster_ids_all_isolated()
-    print('Successfully tested!')
