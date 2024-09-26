@@ -43,6 +43,7 @@ jobs:
           rustup show
           rustup install nightly
           rustup default nightly
+          rustup component add rustfmt
       - uses: mozilla-actions/sccache-action@v0.0.3
       - run: make .venv
       - run: make pre-commit
