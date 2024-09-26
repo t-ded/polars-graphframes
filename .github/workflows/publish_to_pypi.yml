@@ -44,6 +44,7 @@ jobs:
           rustup install nightly
           rustup default nightly
           rustup component add rustfmt
+          rustup component add clippy
       - uses: mozilla-actions/sccache-action@v0.0.3
       - run: make .venv
       - run: make pre-commit
