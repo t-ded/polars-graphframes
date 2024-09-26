@@ -17,3 +17,6 @@ module-name = "polars_graphframes._internal"
 [[tool.mypy.overrides]]
 module = "polars.utils.udfs"
 ignore_missing_imports = true
+
+[tool.poetry.dependencies]
+ruff = "0.6.8"
