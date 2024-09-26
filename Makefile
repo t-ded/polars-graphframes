@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
 .venv:
-    python -m venv .venv
+	python -m venv .venv
 
 install: .venv
 	unset CONDA_PREFIX && \
