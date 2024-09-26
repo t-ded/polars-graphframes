@@ -12,12 +12,12 @@ def test_simple_test_case() -> None:
         }
     )
 
-    result = df.with_columns(
+    result = df.lazy().with_columns(
         cluster_id=get_cluster_ids(
-            node_definition='user',
-            edge_definitions=['phone', 'email'],
+            node_definition=pl.col('user'),
+            edge_definitions=['phone', df.select('email').to_series()],
         )
-    )
+    ).collect()
 
     print(result)
     assert result.select('cluster_id').equals(pl.DataFrame({'cluster_id' : [0] * 6 + [1]}))
