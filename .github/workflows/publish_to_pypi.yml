@@ -39,7 +39,10 @@ jobs:
           
 
       - name: Set up Rust
-        run: rustup show
+        run: | 
+          rustup show
+          rustup install nightly
+          rustup default nightly
       - uses: mozilla-actions/sccache-action@v0.0.3
       - run: make .venv
       - run: make pre-commit
