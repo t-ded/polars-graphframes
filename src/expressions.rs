@@ -10,13 +10,13 @@ use petgraph::algo::tarjan_scc;
 #[polars_expr(output_type=UInt64)]
 fn get_cluster_ids(inputs: &[Series]) -> PolarsResult<Series> {
 
-    let node_definition = (&inputs[0]).u64()?;
+    let node_definition = inputs[0].u64()?;
     let edgelist = (1..inputs.len())
         .flat_map(|i| {
             node_definition
                 .iter()
-                .filter_map(|x| x)
-                .zip((&inputs[i]).u64().unwrap().iter().filter_map(|y| y))
+                .flatten()
+                .zip(inputs[i].u64().unwrap().iter().flatten())
         });
     let graph = UnGraphMap::<_, ()>::from_edges(edgelist);
 
@@ -28,7 +28,6 @@ fn get_cluster_ids(inputs: &[Series]) -> PolarsResult<Series> {
         })
         .collect::<HashMap<_, _>>();
 
-    let ca = (&inputs[0]).u64()?;
-    let out = ca.apply_values(|x| *cluster_id_mapping.get(&x).unwrap());
+    let out = node_definition.apply_values(|x| *cluster_id_mapping.get(&x).unwrap());
     Ok(out.into_series())
 }
