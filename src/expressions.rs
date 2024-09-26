@@ -1,7 +1,6 @@
 #![allow(clippy::unused_unit)]
 
 use std::collections::HashMap;
-use std::iter::zip;
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 use petgraph::graphmap::UnGraphMap;
@@ -11,26 +10,25 @@ use petgraph::algo::tarjan_scc;
 #[polars_expr(output_type=UInt64)]
 fn get_cluster_ids(inputs: &[Series]) -> PolarsResult<Series> {
 
-    let mut edgelist: Vec<(u64, u64)> = Vec::with_capacity((&inputs[0]).len() * (inputs.len() - 1));
-    for i in 1..inputs.len() {
-        edgelist.extend(
-            zip(
-                (&inputs[0]).u64()?.iter().filter_map(|x| x),
-                (&inputs[i]).u64()?.iter().filter_map(|x| x),
-            )
-        )
-    }
+    let node_definition = (&inputs[0]).u64()?;
+    let edgelist = (1..inputs.len())
+        .flat_map(|i| {
+            node_definition
+                .iter()
+                .filter_map(|x| x)
+                .zip((&inputs[i]).u64().unwrap().iter().filter_map(|y| y))
+        });
     let graph = UnGraphMap::<_, ()>::from_edges(edgelist);
 
-    let mut cluster_id_mapping = HashMap::new();
-    for (idx, cc) in tarjan_scc(&graph).into_iter().enumerate() {
-        for node in cc {
-            cluster_id_mapping.insert(node, idx as u64);
-        }
-    }
+    let cluster_id_mapping = tarjan_scc(&graph)
+        .into_iter()
+        .enumerate()
+        .flat_map(|(idx, cc)| {
+            cc.into_iter().map(move |node| (node, idx as u64))
+        })
+        .collect::<HashMap<_, _>>();
 
-    let s = &inputs[0];
-    let ca = s.u64()?;
+    let ca = (&inputs[0]).u64()?;
     let out = ca.apply_values(|x| *cluster_id_mapping.get(&x).unwrap());
     Ok(out.into_series())
 }
